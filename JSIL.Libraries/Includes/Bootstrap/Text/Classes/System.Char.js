@@ -79,6 +79,23 @@ JSIL.ImplementExternals("System.Char", function ($) {
     }
   );
 
+  $.Method({ Static: true, Public: true }, "ConvertToUtf32",
+    new JSIL.MethodSignature($.Int32, [$.String, $.Int32], []),
+    function ConvertToUtf32(s, i) {
+      // If codePointAt is available, use it, but it isn't
+      // widespread enough to rely on yet.
+      if (s.codePointAt)
+        return s.codePointAt(i);
+      // Otherwise, do shifting arithmetic for surrogate pairs.
+      var hs = s.charCodeAt(i);
+      if (hs >= 0xd800 && hs <= 0xdbff) { // High (leading) surrogate
+        var ls = s.charCodeAt(i + 1);
+        return (hs - 0xd800) * 0x400 + (ls - 0xdc00) + 0x10000;
+      }
+      return hs;
+    }
+  );
+
   $.Method({ Static: true, Public: true }, "ToString",
     new JSIL.MethodSignature($.String, [$.Char], []),
     function ToString(c) {
