@@ -104,6 +104,19 @@ JSIL.ImplementExternals("System.Char", function ($) {
     }
   );
 
+  $.Method({ Static: true, Public: true }, "ConvertFromUtf32",
+    new JSIL.MethodSignature($.String, [$.Int32], []),
+    function ConvertFromUtf32(i) {
+      if (i >= 0x10000) {
+        var base = i - 0x10000;
+        var l = base & 0x3ff;
+        var h = base >> 10;
+        return String.fromCharCode(0xd800 + h, 0xdc00 + l);
+      }
+      return String.fromCharCode(i);
+    }
+  );
+
   $.Method({ Static: true, Public: true }, "ToString",
     new JSIL.MethodSignature($.String, [$.Char], []),
     function ToString(c) {
